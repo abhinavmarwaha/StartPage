@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
+import 'package:start_page/constants/colors.dart';
 import 'package:start_page/constants/strings.dart';
 import 'package:start_page/models/start_app.dart';
 import 'package:start_page/utils/db_helper.dart';
@@ -12,6 +15,7 @@ class StartAppsProvider with ChangeNotifier {
     _init();
   }
   bool initilised = false;
+  Random rng = new Random();
 
   DbHelper _dbHelper;
   Map<String, List<StartApp>> _startApps;
@@ -47,6 +51,8 @@ class StartAppsProvider with ChangeNotifier {
   List<StartApp> getStartApps(String cat) => _startApps[cat];
 
   Future insertStartApp(StartApp startApp) async {
+    startApp.color =
+        appColors.keys.toList()[rng.nextInt(appColors.keys.length)];
     await _dbHelper.insertStartApp(startApp);
     if (_startApps[startApp.cat] == null) _startApps[startApp.cat] = [];
     _startApps[startApp.cat].add(startApp);

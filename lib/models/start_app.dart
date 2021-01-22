@@ -6,14 +6,9 @@ class StartApp {
   final String url;
   final String cat;
   final bool app;
+  String color;
 
-  StartApp({
-    this.id,
-    this.title,
-    this.url,
-    this.cat,
-    this.app,
-  });
+  StartApp({this.id, this.title, this.url, this.cat, this.app, this.color});
 
   StartApp copyWith({
     int id,
@@ -38,6 +33,7 @@ class StartApp {
       'url': url,
       'cat': cat,
       'app': app ? 1 : 0,
+      'color': color
     };
   }
 
@@ -49,6 +45,7 @@ class StartApp {
       title: map['title'],
       url: map['url'],
       cat: map['cat'],
+      color: map['color'],
       app: map['app'] == 1 ? true : false,
     );
   }

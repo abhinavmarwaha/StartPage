@@ -27,6 +27,7 @@ dependencies:
 
   # parsers
   metadata_fetch: ^0.3.4
+  http: ^0.12.2
 
 flutter_icons:
   android: "ic_launcher"
@@ -41,3 +42,9 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+
+
+  fonts:
+    - family:  CustomIcons
+      fonts:
+        - asset: assets/fonts/CustomIcons.ttf

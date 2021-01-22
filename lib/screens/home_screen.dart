@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:metadata_fetch/metadata_fetch.dart';
 import 'package:provider/provider.dart';
 import 'package:start_page/constants/colors.dart';
 import 'package:start_page/constants/dimensions.dart';
@@ -12,6 +9,7 @@ import 'package:start_page/models/start_app.dart';
 import 'package:start_page/providers/start_apps_provider.dart';
 import 'package:start_page/screens/saved_later_screen.dart';
 import 'package:start_page/utils/ThemeChanger.dart';
+import 'package:start_page/utils/custom_icons.dart';
 import 'package:start_page/utils/utilities.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,108 +29,124 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+  GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StartAppsProvider>(
-      builder: (context, provider, child) => Scaffold(
-        resizeToAvoidBottomInset: false,
-        floatingActionButton: buildSpeedDial(provider),
-        body: !provider.initilised
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Padding(
-                padding: MediaQuery.of(context).padding,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "StartPage",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                ThemeChanger _themeChanger =
-                                    Provider.of<ThemeChanger>(context,
-                                        listen: false);
-                                _darkMode = !_darkMode;
-                                _themeChanger.setDarkMode(_darkMode);
+        builder: (context, provider, child) => Scaffold(
+              key: _globalKey,
+              resizeToAvoidBottomInset: false,
+              floatingActionButton: buildSpeedDial(provider),
+              body: !provider.initilised
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Padding(
+                      padding: MediaQuery.of(context).padding,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "StartPage",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Spacer(),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
+                                    onTap: () {
+                                      ThemeChanger _themeChanger =
+                                          Provider.of<ThemeChanger>(context,
+                                              listen: false);
+                                      _darkMode = !_darkMode;
+                                      _themeChanger.setDarkMode(_darkMode);
+                                    },
+                                    child: Icon(_darkMode
+                                        ? CustomIcons.sun
+                                        : CustomIcons.moon)),
+                              )
+                            ]),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 7 / 9,
+                                child: ListView(
+                                  children: provider.cats.map<Widget>((cat) {
+                                    if (cat.compareTo("None") == 0) {
+                                      return SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              5 *
+                                              (provider
+                                                      .getStartApps(cat)
+                                                      .length /
+                                                  2),
+                                          child: gridView(provider, cat));
+                                    } else {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                            onLongPressEnd: (details) {
+                                              showDeleteCatDialog(
+                                                  context, provider, cat);
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                cat,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height /
+                                                  5 *
+                                                  (provider
+                                                          .getStartApps(cat)
+                                                          .length /
+                                                      2),
+                                              child: gridView(provider, cat))
+                                        ],
+                                      );
+                                    }
+                                  }).toList(),
+                                )),
+                            RaisedButton(
+                              color: Colors.blueAccent,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0)),
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => SavedLaterScreen()));
                               },
-                              child: Icon(Icons.chat_bubble)),
-                        )
-                      ]),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 7 / 9,
-                          child: ListView(
-                            children: provider.cats.map<Widget>((cat) {
-                              if (cat.compareTo("None") == 0) {
-                                return SizedBox(
-                                    height: MediaQuery.of(context).size.height /
-                                        5 *
-                                        (provider.getStartApps(cat).length / 2),
-                                    child: gridView(provider, cat));
-                              } else {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onLongPressEnd: (details) {
-                                        showDeleteCatDialog(
-                                            context, provider, cat);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          cat,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        height: MediaQuery.of(context)
-                                                .size
-                                                .height /
-                                            5 *
-                                            (provider.getStartApps(cat).length /
-                                                3),
-                                        child: gridView(provider, cat))
-                                  ],
-                                );
-                              }
-                            }).toList(),
-                          )),
-                      RaisedButton(
-                        color: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0)),
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => SavedLaterScreen()));
-                        },
-                        child: Center(
-                            child: Text(
-                          "Saved For Later",
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w400),
-                        )),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-      ),
-    );
+                              child: Center(
+                                  child: Text(
+                                "Saved For Later",
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w400),
+                              )),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+            ));
   }
 
   Widget gridView(StartAppsProvider provider, String cat) {
@@ -159,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: Card(
             elevation: CARDELEVATION,
-            color: appColors.values.toList()[Random().nextInt(4)],
+            color: appColors[provider.getStartApps(cat)[index].color],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0)),
             child: Align(
@@ -207,11 +221,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           SpeedDialChild(
             child: Icon(Icons.category, color: Colors.white),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.blueAccent,
             onTap: () => showCatAddDialog(context, provider),
             label: 'Category',
             labelStyle: TextStyle(fontWeight: FontWeight.w500),
-            labelBackgroundColor: Colors.green,
+            labelBackgroundColor: Colors.blueAccent,
           ),
         ],
       ),
@@ -260,15 +274,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                     height: 60,
                     child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: GestureDetector(
-                          onTap: () {
+                      padding: const EdgeInsets.all(12.0),
+                      child: RaisedButton(
+                          color: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0)),
+                          onPressed: () {
                             provider.deleteStartApp(startApp).then((value) {
                               Navigator.pop(context);
                             });
                           },
-                          child: Text("Delete"),
-                        ))));
+                          child: Center(child: Text("Delete"))),
+                    )));
           });
         });
   }
@@ -280,6 +297,9 @@ class _HomeScreenState extends State<HomeScreen> {
     String catgry = "None";
 
     List<Application> selectedApps = [];
+    TextEditingController _searchText = TextEditingController();
+
+    List<Application> _searchResult = [];
 
     DeviceApps.getInstalledApplications(
             onlyAppsWithLaunchIntent: true, includeSystemApps: true)
@@ -287,97 +307,152 @@ class _HomeScreenState extends State<HomeScreen> {
       showDialog(
           context: context,
           builder: (BuildContext context) {
+            onSearchTextChanged(String text) async {
+              _searchResult.clear();
+              if (text.isEmpty) {
+                setState(() {});
+                return;
+              }
+
+              apps.forEach((app) {
+                if (app.appName.contains(text)) {
+                  _searchResult.add(app);
+                }
+              });
+
+              setState(() {});
+            }
+
             return StatefulBuilder(builder: (context, setState) {
               return Dialog(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0)),
-                  child: Container(
-                      height: 400,
-                      child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            children: [
-                              DropdownButton<String>(
-                                value: catgry,
-                                onChanged: (value) {
-                                  setState(() {
-                                    catgry = value;
-                                  });
-                                },
-                                hint: Text("category"),
-                                items: provider.cats.map((String value) {
-                                  return new DropdownMenuItem<String>(
-                                    value: value,
-                                    child: new Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                              SizedBox(
-                                height: 40,
-                                child: ListView.builder(
-                                  itemCount: selectedApps.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) =>
-                                      GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        apps.add(selectedApps[index]);
-                                        selectedApps.removeAt(index);
-                                      });
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Text(selectedApps[index].appName),
-                                          Icon(
-                                            Icons.cancel,
-                                            size: 12,
-                                          )
-                                        ],
+                  child: SingleChildScrollView(
+                    child: Container(
+                        height: 460,
+                        child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              children: [
+                                DropdownButton<String>(
+                                  value: catgry,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      catgry = value;
+                                    });
+                                  },
+                                  hint: Text("category"),
+                                  items: provider.cats.map((String value) {
+                                    return new DropdownMenuItem<String>(
+                                      value: value,
+                                      child: new Text(value),
+                                    );
+                                  }).toList(),
+                                ),
+                                SizedBox(
+                                  height: 40,
+                                  child: ListView.builder(
+                                    itemCount: selectedApps.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (context, index) =>
+                                        GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedApps.removeAt(index);
+                                        });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Text(selectedApps[index].appName),
+                                            Icon(
+                                              Icons.cancel,
+                                              size: 12,
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 240,
-                                child: ListView.builder(
-                                  itemCount: apps.length,
-                                  itemBuilder: (context, index) =>
-                                      GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedApps.add(apps[index]);
-                                        apps.removeAt(index);
-                                      });
+                                ListTile(
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.cancel),
+                                    onPressed: () {
+                                      _searchText.clear();
+                                      onSearchTextChanged('');
                                     },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(apps[index].appName),
-                                    ),
+                                  ),
+                                  leading: Icon(Icons.search),
+                                  title: TextField(
+                                    onChanged: onSearchTextChanged,
+                                    controller: _searchText,
+                                    decoration: InputDecoration(
+                                        hintText: 'Search',
+                                        border: InputBorder.none),
                                   ),
                                 ),
-                              ),
-                              RaisedButton(
-                                onPressed: () {
-                                  Future.wait(selectedApps.map((app) =>
-                                          provider.insertStartApp(StartApp(
-                                              app: true,
-                                              cat: catgry,
-                                              title: app.appName,
-                                              url: app.packageName))))
-                                      .then((value) {
-                                    Navigator.of(context).pop();
-                                  });
-                                },
-                                child: Text("Save"),
-                                color: Colors.blueAccent,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0)),
-                              )
-                            ],
-                          ))));
+                                SizedBox(
+                                  height: 240,
+                                  child: _searchResult.length != 0 ||
+                                          _searchText.text.isNotEmpty
+                                      ? ListView.builder(
+                                          itemCount: _searchResult.length,
+                                          itemBuilder: (context, index) =>
+                                              GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedApps
+                                                    .add(_searchResult[index]);
+                                              });
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                  _searchResult[index].appName),
+                                            ),
+                                          ),
+                                        )
+                                      : ListView.builder(
+                                          itemCount: apps.length,
+                                          itemBuilder: (context, index) =>
+                                              GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedApps.add(apps[index]);
+                                              });
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(apps[index].appName),
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                                RaisedButton(
+                                  onPressed: () {
+                                    Future.wait(selectedApps.map((app) =>
+                                            provider.insertStartApp(StartApp(
+                                                app: true,
+                                                cat: catgry,
+                                                title: app.appName,
+                                                url: app.packageName))))
+                                        .then((value) {
+                                      Navigator.of(context).pop();
+                                    });
+                                  },
+                                  child: Text("Save"),
+                                  color: Colors.blueAccent,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(15.0)),
+                                )
+                              ],
+                            ))),
+                  ));
             });
           });
     });
@@ -488,17 +563,21 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(15.0)),
                           onPressed: () {
                             if (websiteurlText.text.isNotEmpty) {
-                              extract(websiteurlText.text).then((doc) {
+                              Utilities.showToast("Adding");
+                              Utilities.getTitle(websiteurlText.text)
+                                  .then((title) {
+                                if (title == null) {
+                                  return;
+                                }
                                 provider
                                     .insertStartApp(StartApp(
                                         app: false,
                                         cat: catgry,
-                                        title: doc.title,
+                                        title: title,
                                         url: websiteurlText.text))
                                     .then((value) {
                                   Navigator.pop(context);
                                 });
-                                ;
                               });
                             } else {
                               Utilities.showToast("Url Can't be Empty.");

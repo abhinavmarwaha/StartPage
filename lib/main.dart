@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
           final theme = Provider.of<ThemeChanger>(context);
           return MaterialApp(
             title: 'StartPage',
+            debugShowCheckedModeBanner: false,
             theme: theme.getTheme(),
             home: HomeScreen(),
           );

@@ -16,7 +16,7 @@ class DbHelper {
       join(await getDatabasesPath(), 'app_database.db'),
       onCreate: (db, version) {
         db.execute(
-            "CREATE TABLE StartApp(id INTEGER PRIMARY KEY, title TEXT, url TEXT, cat TEXT, app INTEGER);");
+            "CREATE TABLE StartApp(id INTEGER PRIMARY KEY, title TEXT, url TEXT, cat TEXT, app INTEGER, color TEXT);");
         db.execute(
             "CREATE TABLE SavedLaterItem(id INTEGER PRIMARY KEY, title TEXT, url TEXT, cat TEXT);");
         db.execute(

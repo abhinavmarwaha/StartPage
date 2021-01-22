@@ -28,7 +28,8 @@ class SavedLaterItemsProvider with ChangeNotifier {
       _cats = await _dbHelper.getCategories(SAVEDLATERCATEGORIES);
       List<SavedLaterItem> savedLaterItems =
           await _dbHelper.getSavedLaterItems();
-      _savedLaterItemsAll = savedLaterItems;
+      _savedLaterItemsAll = [];
+      _savedLaterItemsAll.addAll(savedLaterItems);
 
       _cats.forEach((cat) {
         if (_savedLaterItems[cat] == null) _savedLaterItems[cat] = [];
@@ -56,6 +57,7 @@ class SavedLaterItemsProvider with ChangeNotifier {
     if (_savedLaterItems[savedLaterItem.cat] == null)
       _savedLaterItems[savedLaterItem.cat] = [];
     _savedLaterItems[savedLaterItem.cat].add(savedLaterItem);
+    _savedLaterItemsAll.add(savedLaterItem);
     notifyListeners();
   }
 

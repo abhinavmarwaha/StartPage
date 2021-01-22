@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:metadata_fetch/metadata_fetch.dart';
 import 'package:provider/provider.dart';
 import 'package:start_page/models/saved_later_item.dart';
 import 'package:start_page/providers/saved_later_items_provider.dart';
@@ -76,10 +75,19 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(provider
-                                          .getSavedLaterItems(
-                                              selectedCat)[index]
-                                          .title),
+                                      child: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                4 /
+                                                5,
+                                        child: Text(
+                                          provider
+                                              .getSavedLaterItems(
+                                                  selectedCat)[index]
+                                              .title,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
                                     ),
                                     Spacer(),
                                     GestureDetector(
@@ -122,6 +130,8 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0)),
                             color: Colors.blueAccent,
                             onPressed: () {
                               provider
@@ -151,11 +161,11 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
         ),
         SpeedDialChild(
           child: Icon(Icons.category, color: Colors.white),
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.blueAccent,
           onTap: () => showCatAddDialog(context, provider),
           label: 'Category',
           labelStyle: TextStyle(fontWeight: FontWeight.w500),
-          labelBackgroundColor: Colors.green,
+          labelBackgroundColor: Colors.blueAccent,
         ),
       ],
     );
@@ -260,22 +270,34 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                         width: 320,
                         height: 40,
                         child: RaisedButton(
+                          color: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0)),
                           onPressed: () {
-                            if (websiteurlText.text.isNotEmpty) {
-                              extract(websiteurlText.text).then((doc) {
-                                provider
-                                    .insertSavedLater(SavedLaterItem(
-                                        cat: catgry,
-                                        title: doc.title,
-                                        url: websiteurlText.text))
-                                    .then((value) {
-                                  selectedCat = catgry;
-                                  Navigator.pop(context);
+                            try {
+                              if (websiteurlText.text.isNotEmpty) {
+                                Utilities.showToast("Adding");
+                                Utilities.getTitle(websiteurlText.text)
+                                    .then((title) {
+                                  if (title == null) {
+                                    return;
+                                  }
+
+                                  provider
+                                      .insertSavedLater(SavedLaterItem(
+                                          cat: catgry,
+                                          title: title,
+                                          url: websiteurlText.text))
+                                      .then((value) {
+                                    selectedCat = catgry;
+                                    Navigator.pop(context);
+                                  });
                                 });
-                                ;
-                              });
-                            } else {
-                              Utilities.showToast("Url Can't be Empty.");
+                              } else {
+                                Utilities.showToast("Url Can't be Empty.");
+                              }
+                            } catch (e) {
+                              Utilities.showToast("Invalid URL");
                             }
                           },
                           child: Text("Save"),
