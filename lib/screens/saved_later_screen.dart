@@ -35,7 +35,7 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                                       provider.cats[index].compareTo("All") == 0
                                           ? null
                                           : (details) {
-                                              showDeleteCatDialog(
+                                              showEditDeleteCatDialog(
                                                   context,
                                                   provider,
                                                   provider.cats[index]);
@@ -71,19 +71,19 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                             double xVel = details.velocity.pixelsPerSecond.dx;
 
                             if (xVel < 0) {
-                              Utilities.vibrate();
                               print("right swipe");
                               if (selectedCatIndex !=
                                   provider.cats.length - 1) {
+                                Utilities.vibrate();
                                 setState(() {
                                   selectedCatIndex++;
                                   selectedCat = provider.cats[selectedCatIndex];
                                 });
                               }
                             } else if (xVel > 0) {
-                              Utilities.vibrate();
                               print("left swipe");
                               if (selectedCatIndex != 0) {
+                                Utilities.vibrate();
                                 setState(() {
                                   selectedCatIndex--;
                                   selectedCat = provider.cats[selectedCatIndex];
@@ -147,8 +147,10 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
     );
   }
 
-  showDeleteCatDialog(
+  showEditDeleteCatDialog(
       BuildContext context, SavedLaterItemsProvider provider, String cat) {
+    TextEditingController _catController = TextEditingController();
+    _catController.text = cat;
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -157,20 +159,39 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0)),
                 child: Container(
-                    height: 60,
+                    height: 120,
                     child: Center(
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
-                        child: RaisedButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0)),
-                            color: Colors.blueAccent,
-                            onPressed: () {
-                              provider
-                                  .deleteCategory(cat)
-                                  .then((value) => Navigator.pop(context));
-                            },
-                            child: Text("Delete")),
+                        child: Column(children: [
+                          TextField(
+                            controller: _catController,
+                          ),
+                          Row(children: [
+                            RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0)),
+                                color: Colors.blueAccent,
+                                onPressed: () {
+                                  provider.editCategory(
+                                      cat, _catController.text);
+                                },
+                                child: Text("Save")),
+                            SizedBox(
+                              width: 26,
+                            ),
+                            RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0)),
+                                color: Colors.blueAccent,
+                                onPressed: () {
+                                  provider
+                                      .deleteCategory(cat)
+                                      .then((value) => Navigator.pop(context));
+                                },
+                                child: Text("Delete")),
+                          ]),
+                        ]),
                       ),
                     )));
           });

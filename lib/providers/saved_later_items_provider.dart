@@ -83,4 +83,34 @@ class SavedLaterItemsProvider with ChangeNotifier {
         .removeWhere((element) => element.cat.compareTo(cat) == 0);
     notifyListeners();
   }
+
+  Future editCategory(String catPrev, String catNew) async {
+    await _dbHelper.editCategory(catPrev, catNew, SAVEDLATERCATEGORIES);
+    int index = _cats.indexOf(catPrev);
+    _cats[index] = catNew;
+    _savedLaterItems[catNew] = [];
+    for (int i = 0; i < _savedLaterItems[catPrev].length; i++) {
+      final savedLaterItem = _savedLaterItems[catPrev][i];
+      savedLaterItem.cat = catNew;
+      _dbHelper.editSavedLater(savedLaterItem);
+      _savedLaterItems[catNew].add(savedLaterItem);
+    }
+    _savedLaterItems[catPrev].clear();
+    // _savedLaterItems[catPrev] = null;
+    notifyListeners();
+  }
+
+  // Future editCategory(String catPrev, String catNew) async {
+  //   await _dbHelper.editCategory(catPrev, catNew, APPCATEGORIES);
+  //   int index = _cats.indexOf(catPrev);
+  //   _cats[index] = catNew;
+  //   _startApps[catNew] = [];
+  //   for (int i = 0; i < _startApps[catPrev].length; i++) {
+  //     final app = _startApps[catPrev][i];
+  //     app.cat = catNew;
+  //
+  //   }
+  //
+  //   notifyListeners();
+  // }
 }

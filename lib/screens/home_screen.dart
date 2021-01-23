@@ -1,6 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:provider/provider.dart';
 import 'package:start_page/constants/colors.dart';
@@ -18,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _darkMode = false;
+  String title;
 
   @override
   void initState() {
@@ -26,6 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _darkMode = value;
       });
     });
+    Utilities.getStartPageTitle().then((value) => setState(() {
+          title = value;
+        }));
     super.initState();
   }
 
@@ -50,13 +55,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "StartPage",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                              GestureDetector(
+                                onLongPressEnd: (details) {
+                                  showEditStartPageDialog();
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    title,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                               Spacer(),
@@ -89,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: [
                                           GestureDetector(
                                             onLongPressEnd: (details) {
-                                              showDeleteCatDialog(
+                                              showDeleteEditCatDialog(
                                                   context, provider, cat);
                                             },
                                             child: Padding(
@@ -215,8 +225,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  showDeleteCatDialog(
-      BuildContext context, StartAppsProvider provider, String cat) {
+  showEditStartPageDialog() {
+    TextEditingController _titleController = TextEditingController();
+    _titleController.text = title;
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -225,12 +236,82 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0)),
                 child: Container(
-                    height: 60,
+                    height: 120,
                     width: 20,
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Center(
+                      child: Column(children: [
+                        TextField(
+                          controller: _titleController,
+                        ),
+                        Center(
                           child: RaisedButton(
+                              color: Colors.blueAccent,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0)),
+                              onPressed: () {
+                                if (_titleController.text.isNotEmpty) {
+                                  Utilities.setStartPageTitle(
+                                          _titleController.text)
+                                      .then((value) {
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      title = _titleController.text;
+                                    });
+                                  });
+                                } else {
+                                  Utilities.showToast("Can't Be Empty.");
+                                }
+                              },
+                              child: Text("Save")),
+                        ),
+                      ]),
+                    )));
+          });
+        });
+  }
+
+  showDeleteEditCatDialog(
+      BuildContext context, StartAppsProvider provider, String cat) {
+    TextEditingController _catController = TextEditingController();
+    _catController.text = cat;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)),
+                child: Container(
+                    height: 120,
+                    width: 20,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(children: [
+                        TextField(
+                          controller: _catController,
+                        ),
+                        Row(children: [
+                          RaisedButton(
+                              color: Colors.blueAccent,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0)),
+                              onPressed: () {
+                                if (_catController.text.isNotEmpty) {
+                                  provider
+                                      .editCategory(cat, _catController.text)
+                                      .then((value) {
+                                    Navigator.pop(context);
+                                  });
+                                } else {
+                                  Utilities.showToast("Can't Be Empty.");
+                                }
+                              },
+                              child: Text("Save")),
+                          SizedBox(
+                            width: 26,
+                          ),
+                          RaisedButton(
                               color: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15.0)),
@@ -239,7 +320,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.pop(context);
                                 });
                               },
-                              child: Text("Delete"))),
+                              child: Text("Delete")),
+                        ]),
+                      ]),
                     )));
           });
         });
@@ -287,9 +370,9 @@ class _HomeScreenState extends State<HomeScreen> {
     DeviceApps.getInstalledApplications(
             onlyAppsWithLaunchIntent: true, includeSystemApps: true)
         .then((apps) {
-      apps.forEach((app) {
-        app.appName.toLowerCase();
-      });
+      // for (int i = 0; i < apps.length; i++) {
+      //   apps[i].appName = apps[i].appName.toLowerCase();
+      // }
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -378,6 +461,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   leading: Icon(Icons.search),
                                   title: TextField(
+                                    textCapitalization:
+                                        TextCapitalization.words,
                                     // onChanged: onSearchTextChanged,
                                     controller: _searchText,
                                     decoration: InputDecoration(

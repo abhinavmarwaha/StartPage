@@ -4,7 +4,7 @@ class SavedLaterItem {
   final int id;
   final String title;
   final String url;
-  final String cat;
+  String cat;
 
   SavedLaterItem({
     this.id,

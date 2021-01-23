@@ -78,4 +78,20 @@ class StartAppsProvider with ChangeNotifier {
     _startApps[cat].clear();
     notifyListeners();
   }
+
+  Future editCategory(String catPrev, String catNew) async {
+    await _dbHelper.editCategory(catPrev, catNew, APPCATEGORIES);
+    int index = _cats.indexOf(catPrev);
+    _cats[index] = catNew;
+    _startApps[catNew] = [];
+    for (int i = 0; i < _startApps[catPrev].length; i++) {
+      final app = _startApps[catPrev][i];
+      app.cat = catNew;
+      _dbHelper.editStartApp(app);
+      _startApps[catNew].add(app);
+    }
+    _startApps[catPrev].clear();
+    _startApps[catPrev] = null;
+    notifyListeners();
+  }
 }

@@ -132,8 +132,6 @@ class DbHelper {
     batch.delete(appDb, where: "cat == ?", whereArgs: [name]);
     batch.delete(
       catDb,
-      where: "name = ?",
-      whereArgs: [name],
     );
     await batch.commit();
   }
@@ -143,17 +141,42 @@ class DbHelper {
     await db.delete(dbName);
   }
 
-  // Future<void> editStartApp(StartApp startApp) async {
-  //   final db = await getdb;
+  Future<void> editCategory(
+      String prevCat, String newCat, String dbName) async {
+    final db = await getdb;
 
-  //   await db.update(
-  //     STARTAPP,
-  //     startApp.toMap(),
-  //     where: "id = ?",
-  //     whereArgs: [startApp.id],
-  //     conflictAlgorithm: ConflictAlgorithm.replace,
-  //   );
-  // }
+    await db.update(
+      dbName,
+      {'name': newCat},
+      where: "name = ?",
+      whereArgs: [prevCat],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> editStartApp(StartApp startApp) async {
+    final db = await getdb;
+
+    await db.update(
+      STARTAPP,
+      startApp.toMap(),
+      where: "id = ?",
+      whereArgs: [startApp.id],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> editSavedLater(SavedLaterItem savedLaterItem) async {
+    final db = await getdb;
+
+    await db.update(
+      SAVEDLATERITEM,
+      savedLaterItem.toMap(),
+      where: "id = ?",
+      whereArgs: [savedLaterItem.id],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
 
   Future close() async {
     var dbClient = await getdb;
