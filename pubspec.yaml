@@ -24,6 +24,7 @@ dependencies:
   # Widgets
   fluttertoast: ^7.1.6
   flutter_speed_dial: ^1.2.5
+  vibration: ^1.7.3
 
   # parsers
   metadata_fetch: ^0.3.4

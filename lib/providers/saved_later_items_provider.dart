@@ -64,6 +64,7 @@ class SavedLaterItemsProvider with ChangeNotifier {
   Future deleteSavedLater(SavedLaterItem savedLaterItem) async {
     await _dbHelper.deleteSavedLater(savedLaterItem.id);
     _savedLaterItems[savedLaterItem.cat].remove(savedLaterItem);
+    _savedLaterItemsAll.remove(savedLaterItem);
     notifyListeners();
   }
 
@@ -77,6 +78,9 @@ class SavedLaterItemsProvider with ChangeNotifier {
   Future deleteCategory(String cat) async {
     await _dbHelper.deleteCat(cat, SAVEDLATERCATEGORIES, SAVEDLATERITEM);
     _cats.remove(cat);
+    _savedLaterItems[cat].clear();
+    _savedLaterItemsAll
+        .removeWhere((element) => element.cat.compareTo(cat) == 0);
     notifyListeners();
   }
 }

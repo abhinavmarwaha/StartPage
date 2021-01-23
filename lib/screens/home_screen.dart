@@ -81,16 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: ListView(
                                   children: provider.cats.map<Widget>((cat) {
                                     if (cat.compareTo("None") == 0) {
-                                      return SizedBox(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              5 *
-                                              (provider
-                                                      .getStartApps(cat)
-                                                      .length /
-                                                  2),
-                                          child: gridView(provider, cat));
+                                      return gridView(provider, cat);
                                     } else {
                                       return Column(
                                         crossAxisAlignment:
@@ -112,16 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height /
-                                                  5 *
-                                                  (provider
-                                                          .getStartApps(cat)
-                                                          .length /
-                                                      2),
-                                              child: gridView(provider, cat))
+                                          gridView(provider, cat)
                                         ],
                                       );
                                     }
@@ -153,6 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (provider.getStartApps(cat).length == 0) return Container();
     return GridView.builder(
       physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       itemCount: provider.getStartApps(cat).length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -304,26 +287,35 @@ class _HomeScreenState extends State<HomeScreen> {
     DeviceApps.getInstalledApplications(
             onlyAppsWithLaunchIntent: true, includeSystemApps: true)
         .then((apps) {
+      apps.forEach((app) {
+        app.appName.toLowerCase();
+      });
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            onSearchTextChanged(String text) async {
-              _searchResult.clear();
-              if (text.isEmpty) {
+            return StatefulBuilder(builder: (context, setState) {
+              onSearchTextChanged(String text) async {
+                print("DEBUG search String: " + text);
+                _searchResult.clear();
+                if (text.isEmpty) {
+                  setState(() {});
+                  return;
+                }
+
+                apps.forEach((app) {
+                  if (app.appName.contains(text)) {
+                    _searchResult.add(app);
+                  }
+                });
+
+                print("Search Result: " + _searchResult.length.toString());
+
                 setState(() {});
-                return;
               }
 
-              apps.forEach((app) {
-                if (app.appName.contains(text)) {
-                  _searchResult.add(app);
-                }
+              _searchText.addListener(() {
+                onSearchTextChanged(_searchText.text);
               });
-
-              setState(() {});
-            }
-
-            return StatefulBuilder(builder: (context, setState) {
               return Dialog(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0)),
@@ -386,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   leading: Icon(Icons.search),
                                   title: TextField(
-                                    onChanged: onSearchTextChanged,
+                                    // onChanged: onSearchTextChanged,
                                     controller: _searchText,
                                     decoration: InputDecoration(
                                         hintText: 'Search',

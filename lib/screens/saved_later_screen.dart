@@ -11,6 +11,7 @@ class SavedLaterScreen extends StatefulWidget {
 
 class _SavedLaterScreenState extends State<SavedLaterScreen> {
   String selectedCat = "All";
+  int selectedCatIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Consumer<SavedLaterItemsProvider>(
@@ -41,7 +42,9 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                                             },
                                   onTap: () {
                                     setState(() {
+                                      Utilities.vibrate();
                                       selectedCat = provider.cats[index];
+                                      selectedCatIndex = index;
                                     });
                                   },
                                   child: Padding(
@@ -49,6 +52,7 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                                     child: Text(
                                       provider.cats[index],
                                       style: TextStyle(
+                                          fontSize: 18,
                                           color: selectedCat.compareTo(
                                                       provider.cats[index]) ==
                                                   0
@@ -61,54 +65,82 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                             ),
                           )),
                       Expanded(
-                        child: ListView.builder(
-                          itemBuilder: (context, index) => GestureDetector(
-                            onTap: () {
-                              Utilities.launchUrl(provider
-                                  .getSavedLaterItems(selectedCat)[index]
-                                  .url);
-                            },
-                            child: SizedBox(
-                              height: 60,
-                              child: Card(
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                4 /
-                                                5,
-                                        child: Text(
-                                          provider
-                                              .getSavedLaterItems(
-                                                  selectedCat)[index]
-                                              .title,
-                                          overflow: TextOverflow.ellipsis,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onPanEnd: (details) {
+                            double xVel = details.velocity.pixelsPerSecond.dx;
+
+                            if (xVel < 0) {
+                              Utilities.vibrate();
+                              print("right swipe");
+                              if (selectedCatIndex !=
+                                  provider.cats.length - 1) {
+                                setState(() {
+                                  selectedCatIndex++;
+                                  selectedCat = provider.cats[selectedCatIndex];
+                                });
+                              }
+                            } else if (xVel > 0) {
+                              Utilities.vibrate();
+                              print("left swipe");
+                              if (selectedCatIndex != 0) {
+                                setState(() {
+                                  selectedCatIndex--;
+                                  selectedCat = provider.cats[selectedCatIndex];
+                                });
+                              }
+                            }
+                          },
+                          child: ListView.builder(
+                            itemBuilder: (context, index) => GestureDetector(
+                              onTap: () {
+                                Utilities.launchUrl(provider
+                                    .getSavedLaterItems(selectedCat)[index]
+                                    .url);
+                              },
+                              child: SizedBox(
+                                height: 60,
+                                child: Card(
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              4 /
+                                              5,
+                                          child: Text(
+                                            provider
+                                                .getSavedLaterItems(
+                                                    selectedCat)[index]
+                                                .title,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Spacer(),
-                                    GestureDetector(
-                                        onTap: () {
-                                          provider.deleteSavedLater(
-                                              provider.getSavedLaterItems(
-                                                  selectedCat)[index]);
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Icon(Icons.delete),
-                                        ))
-                                  ],
+                                      Spacer(),
+                                      GestureDetector(
+                                          onTap: () {
+                                            provider.deleteSavedLater(
+                                                provider.getSavedLaterItems(
+                                                    selectedCat)[index]);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Icon(Icons.delete),
+                                          ))
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
+                            itemCount:
+                                provider.getSavedLaterItems(selectedCat).length,
                           ),
-                          itemCount:
-                              provider.getSavedLaterItems(selectedCat).length,
                         ),
-                      )
+                      ),
                     ],
                   ),
                 )),
@@ -155,7 +187,7 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
           child: Icon(Icons.web, color: Colors.white),
           backgroundColor: Colors.green,
           onTap: () => showWebAddDialog(context, provider),
-          label: 'Website',
+          label: 'url',
           labelStyle: TextStyle(fontWeight: FontWeight.w500),
           labelBackgroundColor: Colors.green,
         ),
@@ -249,7 +281,7 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                       TextField(
                         controller: websiteurlText,
                         decoration: InputDecoration(
-                            border: InputBorder.none, hintText: 'Website Link'),
+                            border: InputBorder.none, hintText: 'url'),
                       ),
                       DropdownButton<String>(
                         value: catgry,

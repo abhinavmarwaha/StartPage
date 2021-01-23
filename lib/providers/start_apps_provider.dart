@@ -75,6 +75,7 @@ class StartAppsProvider with ChangeNotifier {
   Future deleteCategory(String cat) async {
     await _dbHelper.deleteCat(cat, APPCATEGORIES, STARTAPP);
     _cats.remove(cat);
+    _startApps[cat].clear();
     notifyListeners();
   }
 }

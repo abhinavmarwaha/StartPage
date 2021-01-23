@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:metadata_fetch/metadata_fetch.dart';
+import 'package:vibration/vibration.dart';
 
 class Utilities {
   static void launchUrl(String url) {
@@ -33,6 +34,12 @@ class Utilities {
     } catch (e) {
       Utilities.showToast("Invalid url");
       return null;
+    }
+  }
+
+  static void vibrate() async {
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate(duration: 70, amplitude: 10);
     }
   }
 }
