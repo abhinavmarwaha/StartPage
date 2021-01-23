@@ -25,9 +25,9 @@ StartPage - App to start your day with.
 </p>
 
 <p align='center'> 
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="270" height="540"/>
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="270" height="540"/>
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="270" height="540"/> 
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="256" height="384"/>
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="256" height="384"/>
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="256" height="384"/> 
 </p>
 
 
