@@ -169,19 +169,36 @@ class _HomeScreenState extends State<HomeScreen> {
             color: appColors[provider.getStartApps(cat)[index].color],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0)),
-            child: Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    provider.getStartApps(cat)[index].title,
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )),
+            child: Stack(children: [
+              // Positioned.fill(
+              //     child: Align(
+              //   alignment: Alignment.topLeft,
+              //   child: Padding(
+              //     padding: const EdgeInsets.all(8.0),
+              //     child: Icon(
+              //       provider.getStartApps(cat)[index].app
+              //           ? Icons.apps
+              //           : Icons.web,
+              //       size: 14,
+              //     ),
+              //   ),
+              // )),
+              Positioned.fill(
+                child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        provider.getStartApps(cat)[index].title,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )),
+              ),
+            ]),
           ),
         );
       },
@@ -643,7 +660,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Utilities.showToast("Adding");
                               Utilities.getTitle(websiteurlText.text)
                                   .then((title) {
+                                print("Inside adding");
                                 if (title == null) {
+                                  Utilities.showToast("Can't parse title.");
                                   return;
                                 }
                                 provider
@@ -653,6 +672,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         title: title,
                                         url: websiteurlText.text))
                                     .then((value) {
+                                  print("After adding");
                                   Navigator.pop(context);
                                 });
                               });

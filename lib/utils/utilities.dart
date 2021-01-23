@@ -29,9 +29,19 @@ class Utilities {
 
   static Future<String> getTitle(String url) async {
     try {
+      url = url.trim();
+      if (!(url.contains("https://") || url.contains("http://"))) {
+        print("Adding https");
+        url = "https://" + url;
+      }
+      print(url);
+      print("Finding Title");
       var response = await http.get(url);
+      print("Found Title1");
       var document = responseToDocument(response);
+      print("Found Title2");
       var data = MetadataParser.parse(document);
+      print("Found Titl3 " + data.title.toString());
       return data.title;
     } catch (e) {
       Utilities.showToast("Invalid url");
