@@ -329,6 +329,13 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                           onPressed: () {
                             try {
                               if (websiteurlText.text.isNotEmpty) {
+                                if (!(websiteurlText.text
+                                        .contains("https://") ||
+                                    websiteurlText.text.contains("http://"))) {
+                                  print("Adding https");
+                                  websiteurlText.text =
+                                      "https://" + websiteurlText.text;
+                                }
                                 Utilities.showToast("Adding");
                                 Utilities.getTitle(websiteurlText.text)
                                     .then((title) {

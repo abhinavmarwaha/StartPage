@@ -658,6 +658,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () {
                             if (websiteurlText.text.isNotEmpty) {
                               Utilities.showToast("Adding");
+                              if (!(websiteurlText.text.contains("https://") ||
+                                  websiteurlText.text.contains("http://"))) {
+                                print("Adding https");
+                                websiteurlText.text =
+                                    "https://" + websiteurlText.text;
+                              }
+
                               Utilities.getTitle(websiteurlText.text)
                                   .then((title) {
                                 print("Inside adding");
