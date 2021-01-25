@@ -35,7 +35,6 @@ StartPage - App to start your day with.
 
 * site and app shortcuts
 * saved later items with categories
-* open source
 * Dark Mode
 
 # Have Suggetions ?
