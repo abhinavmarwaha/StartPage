@@ -9,7 +9,7 @@ StartPage - App to start your day with.
 </p>
 
 <p align='center'>
-    <a href='ttps://play.google.com/store/apps/details?id=com.abhinavmarwaha.start_page'>
+    <a href='https://play.google.com/store/apps/details?id=com.abhinavmarwaha.start_page'>
         <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='/assets/get-it-on-play-store.png' />
     </a>
     <a href='https://github.com/abhinavmarwaha/StartPage/releases/latest'>
