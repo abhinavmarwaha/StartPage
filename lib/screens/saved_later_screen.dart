@@ -340,7 +340,9 @@ class _SavedLaterScreenState extends State<SavedLaterScreen> {
                                 Utilities.getTitle(websiteurlText.text)
                                     .then((title) {
                                   if (title == null) {
-                                    return;
+                                    title = Utilities.parseTitle(
+                                        websiteurlText.text);
+                                    Utilities.showToast('Title Parsing Error');
                                   }
 
                                   provider

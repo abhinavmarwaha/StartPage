@@ -35,18 +35,25 @@ class Utilities {
         url = "https://" + url;
       }
       print(url);
-      print("Finding Title");
       var response = await http.get(url);
-      print("Found Title1");
       var document = responseToDocument(response);
-      print("Found Title2");
       var data = MetadataParser.parse(document);
-      print("Found Titl3 " + data.title.toString());
       return data.title;
     } catch (e) {
       Utilities.showToast("Invalid url");
       return null;
     }
+  }
+
+  static String parseTitle(String url) {
+    if (url.contains('https://'))
+      url = url.substring(url.indexOf('https://') + 8);
+    if (url.contains('http://'))
+      url = url.substring(url.indexOf('http://') + 7);
+    if (url.contains('www.')) url = url.substring(url.indexOf('www.') + 4);
+    int dot = url.indexOf('.');
+    print("URL DeBUG: " + url);
+    return url.substring(0, dot);
   }
 
   static void vibrate() async {

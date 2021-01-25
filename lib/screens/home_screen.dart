@@ -667,10 +667,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               Utilities.getTitle(websiteurlText.text)
                                   .then((title) {
-                                print("Inside adding");
                                 if (title == null) {
-                                  Utilities.showToast("Can't parse title.");
-                                  return;
+                                  title =
+                                      Utilities.parseTitle(websiteurlText.text);
+                                  Utilities.showToast('Title Parsing Error');
                                 }
                                 provider
                                     .insertStartApp(StartApp(
